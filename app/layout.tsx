@@ -188,6 +188,27 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* Fail-safe Service Worker Registration */}
+        {process.env.NODE_ENV === "production" && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                if ('serviceWorker' in navigator) {
+                  window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').then(
+                      function(reg) {
+                        console.log('ServiceWorker registered with scope:', reg.scope);
+                      },
+                      function(err) {
+                        console.log('ServiceWorker registration failed:', err);
+                      }
+                    );
+                  });
+                }
+              `
+            }}
+          />
+        )}
         {children}
       </body>
     </html>
